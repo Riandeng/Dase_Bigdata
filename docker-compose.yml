@@ -1,0 +1,67 @@
+version: '3'
+
+services:
+  hadoop-namenode:
+    image: sequenceiq/hadoop-docker:2.7.1
+    container_name: hadoop-namenode
+    environment:
+      - CLUSTER_NAME=testcluster
+    ports:
+      - "50070:50070"  # Namenode UI
+      - "9000:9000"    # HDFS
+    volumes:
+      - hadoop_namenode_data:/hadoop/dfs/name
+    networks:
+      - hadoop_network
+
+  hadoop-datanode:
+    image: sequenceiq/hadoop-docker:2.7.1
+    container_name: hadoop-datanode
+    environment:
+      - CLUSTER_NAME=testcluster
+      - NAMENODE_URL=hadoop-namenode:9000
+    ports:
+      - "50075:50075"  # Datanode UI
+    volumes:
+      - hadoop_datanode_data:/hadoop/dfs/data
+    networks:
+      - hadoop_network
+
+  yarn:
+    image: sequenceiq/hadoop-docker:2.7.1
+    container_name: yarn
+    environment:
+      - CLUSTER_NAME=testcluster
+      - HDFS_NAMENODE=hadoop-namenode:9000
+    ports:
+      - "8088:8088"  # Resource Manager UI
+    networks:
+      - hadoop_network
+
+  spark-master:
+    image: bitnami/spark:latest
+    container_name: spark-master
+    environment:
+      - SPARK_MODE=master
+      - SPARK_MASTER_HOST=spark-master
+    ports:
+      - "8080:8080"  # Spark UI
+    networks:
+      - hadoop_network
+
+  spark-worker:
+    image: bitnami/spark:latest
+    container_name: spark-worker
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER=spark://spark-master:7077
+    networks:
+      - hadoop_network
+
+networks:
+  hadoop_network:
+    driver: bridge
+
+volumes:
+  hadoop_namenode_data:
+  hadoop_datanode_data:
