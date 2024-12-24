@@ -160,13 +160,13 @@ Spark RDD Stages:
 | Stage 2 (Reduce) | 4      | -              | 3.95s    |
 | Stage 3 (Sort)   | 4      | -              | 0.59s    |
 
-![execution_time_analysis](.\imgs\execution_time_analysis.png)
+![execution_time_analysis](./imgs/execution_time_analysis.png)
 
-![memory_usage_analysis](.\imgs\memory_usage_analysis.png)
+![memory_usage_analysis](./imgs/memory_usage_analysis.png)
 
-![io_operations_analysis](.\imgs\io_operations_analysis.png)
+![io_operations_analysis](./imgs/io_operations_analysis.png)
 
-![execution_features_table](.\imgs\execution_features_table.png)
+![execution_features_table](./imgs/execution_features_table.png)
 
 Spark 相较于单机 SQLite 的两大优势：
 
@@ -196,29 +196,29 @@ Shuffle 数据量大：RDD 486MB vs SQL 44MB
 
 分别将reducebykey改为combinebykey、aggregatebykey和foldbykey
 
-![operator](.\imgs\operator.jpg)
+![operator](./imgs/operator.jpg)
 
 它们在运行时间上的对比如下：
 
-![execu_orpe](.\imgs\execu_orpe.jpg)
+![execu_orpe](./imgs/execu_orpe.jpg)
 
 可以发现使用FoldByKey的运行时间最长，约为 2.6 分钟；使用CombineByKey的时间约为 2.1 分钟，使用 ReduceByKey 和 AggregateByKey 算子的运行时间相近，约 1.9 分钟。
 
 检查 Shuffle 指标（Shuffle write size 和 Shuffle read size），发现没有明显差别：
 
-![1](.\imgs\1.jpg)
+![1](./imgs/1.jpg)
 
-![2](.\imgs\2.jpg)
+![2](./imgs/2.jpg)
 
-![3](.\imgs\3.jpg)
+![3](./imgs/3.jpg)
 
-![4](.\imgs\4.jpg)
+![4](./imgs/4.jpg)
 
 #### 并行度
 
 通过 spark submit 中的 default.parallelism 来指定执行的并行度。
 
-![5](.\imgs\5.jpg)
+![5](./imgs/5.jpg)
 
 并行度过低时，可能导致资源利用率不足，作业执行时间过长;
 并行度过高时，可能导致过多的任务调度开销，影响性能。
@@ -228,7 +228,7 @@ Shuffle 数据量大：RDD 486MB vs SQL 44MB
 
 使用 persist() 方法缓存customers、orders 、lineitems 。比较MEMORY_ONLY和MEMORY_AND_DISK存储级别。
 
-![cache](.\imgs\cache.jpg)
+![cache](./imgs/cache.jpg)
 
 可以发现，Memory_AND_DISK的运行时间最短。
 
@@ -240,9 +240,9 @@ ReduceByKey 并未对中间结果进行缓存。若数据被频繁访问，重�
 
 通过 spark submit 时的 num-executor 和 executor-cores 来调整 worker 执行时的参数，并通过 driver-cores 和 driver-memory 来调整 driver 执行时的参数。
 
-![6](.\imgs\6.jpg)
+![6](./imgs/6.jpg)
 
-![7](.\imgs\7.jpg)
+![7](./imgs/7.jpg)
 
 实验结果表示， 增加 num-executor 和 executor-cores 可以增加任务的执行的并行度，从而减少任务的执行时间，但是当 num-executor 到达6时，性能出现了下降，可能发生了资源竞争的情况；同时增加 driver-cores 和 driver-memory 并不能显著提升执行性能，对于 1G的 TPC-H负载，调度的任务量并不重，不成为性能瓶颈。
 
